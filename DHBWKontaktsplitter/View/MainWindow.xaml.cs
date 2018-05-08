@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace DHBWKontaktsplitter
+namespace DHBWKontaktsplitter.View
 {
     /// <summary>
     /// Interaktionslogik für MainWindow.xaml
