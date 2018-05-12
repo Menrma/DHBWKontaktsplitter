@@ -58,7 +58,8 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             VerticalContentAlignment="Center"
-            IsEnabled="False" />
+            IsEnabled="False"
+            Text="{Binding Path=Contact.AnredeText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label
             Grid.Row="2"
             Grid.Column="0"
@@ -73,7 +74,8 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             VerticalContentAlignment="Center"
-            IsEnabled="False" />
+            IsEnabled="False"
+            Text="{Binding Contact.BriefanredeText, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label
             Grid.Row="3"
             Grid.Column="0"
@@ -88,7 +90,8 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             VerticalContentAlignment="Center"
-            IsEnabled="False" />
+            IsEnabled="False"
+            Text="{Binding Contact.AllTitles, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label
             Grid.Row="4"
             Grid.Column="0"
@@ -103,7 +106,8 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             VerticalContentAlignment="Center"
-            IsEnabled="False" />
+            IsEnabled="False"
+            Text="{Binding Contact.GeschlechtText, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label
             Grid.Row="5"
             Grid.Column="0"
@@ -118,7 +122,8 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             VerticalContentAlignment="Center"
-            IsEnabled="False" />
+            IsEnabled="False"
+            Text="{Binding Contact.Vorname, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label
             Grid.Row="6"
             Grid.Column="0"
@@ -133,10 +138,19 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             VerticalContentAlignment="Center"
-            IsEnabled="False" />
+            IsEnabled="False"
+            Text="{Binding Contact.Nachname, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
         <Button
             Grid.Row="8"
             Grid.Column="0"
+            Command="{Binding AddNewTitleCommand}"
             Content="Neuer Titel" />
+        <Button
+            Grid.Row="8"
+            Grid.Column="1"
+            Width="100"
+            HorizontalAlignment="Right"
+            Command="{Binding EditContactCommand}"
+            Content="Kontakt ändern" />
     </Grid>
 </Window>

@@ -7,5 +7,7 @@
     StartupUri="View/MainWindow.xaml">
     <Application.Resources>
         <viewModels:MainWindowViewModel x:Key="MainWindowViewModel" />
+        <viewModels:AddNewTitleViewModel x:Key="AddNewTitleViewModel" />
+        <viewModels:ManuelleZuordnungViewModel x:Key="ManuelleZuordnungViewModel" />
     </Application.Resources>
 </Application>

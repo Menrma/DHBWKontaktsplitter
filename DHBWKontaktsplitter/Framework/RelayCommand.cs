@@ -10,6 +10,7 @@ namespace DHBWKontaktsplitter.Framework
 
         readonly Action<object> _execute;
         readonly Predicate<object> _canExecute;
+        private ICommand cancelCommand;
 
         #endregion // Fields
 
@@ -27,6 +28,11 @@ namespace DHBWKontaktsplitter.Framework
 
             _execute = execute;
             _canExecute = canExecute;
+        }
+
+        public RelayCommand(ICommand cancelCommand)
+        {
+            this.cancelCommand = cancelCommand;
         }
         #endregion // Constructors
 
