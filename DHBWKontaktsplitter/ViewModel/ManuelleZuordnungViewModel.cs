@@ -3,6 +3,7 @@ using DHBWKontaktsplitter.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -50,24 +51,43 @@ namespace DHBWKontaktsplitter.ViewModel
 
         private void AddNewTitleCommandExecute(object obj)
         {
-
+            InputListObservable.Add(new ZuordnungModel());
         }
 
         private void SaveZuordnungCommandExecute(object obj)
         {
+            //Lernfunktion für Titel
+            //Alle Titel von der Oberfläche ermitteln und versuchen in die Datenbank zu speichern
+            var titles = InputListObservable.ToList().FindAll(x => x.SelectedDropDownEntry == StaticHelper.Titel);
+            foreach(var entry in titles)
+            {
+                try
+                {
+                    //TODO Erster Parameter weg
+                    var titleInsertCommand = _createSqlParameteTitle(1, entry.EntryText.ToLower().Trim());
+                    int resCount = DatabaseHelper.InsertDatabase(titleInsertCommand);
+                }
+                catch(Exception ex)
+                {
+                    //Titel ist bereits in Datenbank
+                    Console.WriteLine(ex.ToString());
+                }
+            }
 
+            ((Window)obj).Close();
         }
         #endregion
 
         #region Methods
-        #endregion
-    }
+        private SQLiteCommand _createSqlParameteTitle(int languId, string text)
+        {
+            SQLiteCommand cmd = new SQLiteCommand();
+            cmd.CommandText = StaticHelper.InsertTitel;
 
-    public class ZuordnungModel
-    {
-        public string EntryText { get; set; }
-        public string LabelText { get; set; }
-        public ObservableCollection<string> DropDownEntries { get; set; } = new ObservableCollection<string>(StaticHelper.BestandteileList);
-        public string SelectedDropDownEntry { get; set; } = string.Empty;
+            cmd.Parameters.AddWithValue("@spracheID", languId);
+            cmd.Parameters.AddWithValue("@title", text);
+            return cmd;
+        }
+        #endregion
     }
 }

@@ -6,8 +6,8 @@
     xmlns:local="clr-namespace:DHBWKontaktsplitter"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Kontaktsplitter"
-    Width="650"
-    Height="400"
+    Width="708"
+    Height="442"
     DataContext="{StaticResource MainWindowViewModel}"
     mc:Ignorable="d">
     <Window.InputBindings>
@@ -143,14 +143,30 @@
         <Button
             Grid.Row="8"
             Grid.Column="0"
-            Command="{Binding AddNewTitleCommand}"
-            Content="Neuer Titel" />
-        <Button
+            Width="100"
+            Margin="3,0,0,3"
+            HorizontalAlignment="Left"
+            Command="{Binding SaveContactCommand}"
+            Content="Speichern"
+            IsEnabled="{Binding EditButtonIsEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+        <StackPanel
             Grid.Row="8"
             Grid.Column="1"
-            Width="100"
+            Margin="0,0,3,3"
             HorizontalAlignment="Right"
-            Command="{Binding EditContactCommand}"
-            Content="Kontakt ändern" />
+            Orientation="Horizontal">
+            <Button
+                Width="100"
+                HorizontalAlignment="Right"
+                Command="{Binding EditContactCommand}"
+                Content="Kontakt ändern"
+                IsEnabled="{Binding EditButtonIsEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Button
+                Width="100"
+                Margin="10,0,0,0"
+                HorizontalAlignment="Right"
+                Command="{Binding AddNewTitleCommand}"
+                Content="Neuer Titel" />
+        </StackPanel>
     </Grid>
 </Window>

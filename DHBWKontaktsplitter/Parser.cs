@@ -12,17 +12,19 @@ namespace DHBWKontaktsplitter
 {
     public class Parser
     {
-        private ExecutionModel _execModel = new ExecutionModel();
+        private ExecutionModel _execModel;
 
         public ExecutionModel ExecuteInput(string input)
         {
+            _execModel = new ExecutionModel();
             input = input.ToLower();
             //Check input length less than 100 characters or empty
             _checkInputLength(input);
             if (_execModel.HasError) return _execModel;
 
             //Split input at space
-            var inputSplitted = input.Split(' ').ToList<string>();
+            var inputSplitted = input.Split(' ').ToList<string>().FindAll(x => !string.IsNullOrEmpty(x));
+            Console.WriteLine(inputSplitted.Count);
 
             //Check 'Anrede'
             //Create SQLiteParameter for 'Anrede'
@@ -61,7 +63,7 @@ namespace DHBWKontaktsplitter
             {
                 var tmpList = new List<string>(inputSplitted);
 
-                foreach(var inputEntry in tmpList)
+                foreach (var inputEntry in tmpList)
                 {
                     var titlesParameter = _createSqlParameterTitle(languId, inputEntry);
                     var titleTable = DatabaseHelper.CheckDatabase(titlesParameter);
@@ -74,18 +76,23 @@ namespace DHBWKontaktsplitter
                             Sprache_ID = int.Parse(row[1].ToString()),
                             Title = row[2].ToString()
                         });
-                        _removeMatchedParameterFromList(inputSplitted, row[2].ToString());
+                        _removeMatchedParameterFromList(inputSplitted, inputEntry);
                     }
                 }
             }
 
             //Check 'Vorname'
             _execModel.Contact.Vorname = _getFirstNameFromList(inputSplitted);
-            _removeMatchedParameterFromList(inputSplitted, _execModel.Contact.Vorname);
 
             //Check 'Nachname'
-            _execModel.Contact.Nachname = _getLastNameFromList(inputSplitted);
-            _removeMatchedParameterFromList(inputSplitted, _execModel.Contact.Nachname);
+            _execModel.Contact.Nachname = _getLastNameFromList(inputSplitted, _execModel.Contact.Vorname);
+            _removeMatchedParameterFromList(inputSplitted, _execModel.Contact.Vorname);
+
+            var nachnameSplit = _execModel.Contact.Nachname.Split(' ');
+            foreach(var entry in nachnameSplit)
+            {
+                _removeMatchedParameterFromList(inputSplitted, entry);
+            }
 
             _execModel.SplittedInput = inputSplitted;
 
@@ -131,18 +138,29 @@ namespace DHBWKontaktsplitter
             return string.Empty;
         }
 
-        private string _getLastNameFromList(List<string> list)
+        private string _getLastNameFromList(List<string> list, string vname)
         {
             if (list.Count == 1) return list.ElementAt(0);
 
-            bool nextEntry = false;
+            //bool nextEntry = false;
             var lastName = string.Empty;
             foreach(var entry in list)
             {
                 if (entry.Contains(",")) return entry;
-                else if (string.Compare(entry.Last().ToString(), ".") == 0) nextEntry = true;
-                else if (nextEntry) lastName += entry + " ";
+                //else if (string.Compare(entry.Last().ToString(), ".") == 0) nextEntry = true;
+                //else if (nextEntry) lastName += entry + " ";
             }
+
+            if (string.IsNullOrEmpty(vname) && string.IsNullOrEmpty(lastName)) return string.Empty;
+
+            int vnameIdx = list.IndexOf(vname);
+            if(vnameIdx >= 0)
+            {
+                var res = list.GetRange(vnameIdx + 1, list.Count - 1 - vnameIdx);
+                if (res.Count == 0) return string.Empty;
+                lastName = string.Join(" ", res);
+            } 
+
             return lastName;
         }
 

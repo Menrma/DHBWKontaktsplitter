@@ -79,6 +79,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Model\TitleModel.cs" />
+    <Compile Include="Model\ZuordnungModel.cs" />
     <Compile Include="ViewModel\ManuelleZuordnungViewModel.cs" />
     <Compile Include="View\ManuelleZuordnungView.xaml.cs">
       <DependentUpon>ManuelleZuordnungView.xaml</DependentUpon>
