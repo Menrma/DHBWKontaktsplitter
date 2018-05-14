@@ -39,7 +39,9 @@ namespace DHBWKontaktsplitter
                 {
                     title.Title = _uppercaseFirstChar(title.Title);
                     title.Title = title.Title.Trim();
+                    contact.AllTitles += title.Title + " ";
                 }
+                contact.AllTitles = contact.AllTitles?.Trim();
             }
             if (!string.IsNullOrEmpty(contact.Vorname))
             {

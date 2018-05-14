@@ -88,8 +88,8 @@ namespace DHBWKontaktsplitter.ViewModel
                 }
 
                 var formattedContact = Formatter.DoFormat(execModel.Contact);
-                execModel.Contact.TitelList.ForEach(x => execModel.Contact.AllTitles += x.Title + " ");
-                execModel.Contact.AllTitles = execModel.Contact.AllTitles?.Trim();
+                //execModel.Contact.TitelList.ForEach(x => execModel.Contact.AllTitles += x.Title + " ");
+                //execModel.Contact.AllTitles = execModel.Contact.AllTitles?.Trim();
                 EditButtonIsEnabled = true;
             }
 
@@ -98,6 +98,10 @@ namespace DHBWKontaktsplitter.ViewModel
                 // there are not matched items
                 var editList = _openManuelleZuordnung(false, Visibility.Hidden);
                 _mapZurodnungToModel(editList);
+            }
+            else
+            {
+                Contact = execModel.Contact;
             }
         }
 

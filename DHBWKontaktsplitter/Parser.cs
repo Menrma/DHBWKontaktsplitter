@@ -31,31 +31,37 @@ namespace DHBWKontaktsplitter
             var anredeParameter = _createSqlParameterAnrede(inputSplitted);
             var anredeTable = DatabaseHelper.CheckDatabase(anredeParameter);
             int languId = 0;
+            int gId = 0;
 
-            if (anredeTable.Rows.Count > 0)
-            {
+            //if (anredeTable.Rows.Count > 0)
+            //{
                 _execModel.Contact.AnredeText = DatabaseHelper.GetFirstFromDatabaseResult(anredeTable, "ANREDE");
                 _removeMatchedParameterFromList(inputSplitted, _execModel.Contact.AnredeText);
-                languId = int.Parse(DatabaseHelper.GetFirstFromDatabaseResult(anredeTable, "SPRACHE_ID"));
-                int gId = int.Parse(DatabaseHelper.GetFirstFromDatabaseResult(anredeTable, "GESCHLECHT_ID"));
+                int.TryParse(DatabaseHelper.GetFirstFromDatabaseResult(anredeTable, "SPRACHE_ID"), out languId);
+                int.TryParse(DatabaseHelper.GetFirstFromDatabaseResult(anredeTable, "GESCHLECHT_ID"), out gId);
 
-                if (!string.IsNullOrEmpty(_execModel.Contact.AnredeText) && languId != 0 && gId != 0)
-                {
-                    //Get 'Briefanrede'
-                    var briefAnredeParameter = _createSqlParameterBriefanrede(languId, gId);
-                    var bAnredeTable = DatabaseHelper.CheckDatabase(briefAnredeParameter);
-                    _execModel.Contact.BriefanredeText = DatabaseHelper.GetFirstFromDatabaseResult(bAnredeTable, "WERT");
+                if (languId == 0) languId = 1; //DE
+                if (gId == 0) gId = 4; //KA
 
-                    //Get'Geschlecht'
-                    var geschlechtParameter = _createSqlParameteGeschlecht(gId);
-                    var geschlechtTable = DatabaseHelper.CheckDatabase(geschlechtParameter);
-                    _execModel.Contact.GeschlechtText = DatabaseHelper.GetFirstFromDatabaseResult(geschlechtTable, "WERT");
-                }
-            }
-            else
-            {
+                //Get 'Briefanrede'
+                var briefAnredeParameter = _createSqlParameterBriefanrede(languId, gId);
+                var bAnredeTable = DatabaseHelper.CheckDatabase(briefAnredeParameter);
+                _execModel.Contact.BriefanredeText = DatabaseHelper.GetFirstFromDatabaseResult(bAnredeTable, "WERT");
 
-            }
+                //Get'Geschlecht'
+                var geschlechtParameter = _createSqlParameteGeschlecht(gId);
+                var geschlechtTable = DatabaseHelper.CheckDatabase(geschlechtParameter);
+                _execModel.Contact.GeschlechtText = DatabaseHelper.GetFirstFromDatabaseResult(geschlechtTable, "WERT");
+
+                //if (!string.IsNullOrEmpty(_execModel.Contact.AnredeText) && languId != 0)
+                //{
+
+                //}
+            //}
+            //else
+            //{
+
+            //}
 
             //Check 'Title'
             //TODO => Zweiten Paramter ändern
