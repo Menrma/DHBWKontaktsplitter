@@ -59,6 +59,8 @@ namespace DHBWKontaktsplitter
 
         public Tuple<int, string> GetBriefanrede(int languId, int gId)
         {
+            if (languId == 0) languId = 1;
+            if (gId == 0) gId = 4;
 
             var briefAnredeParameter = DBQuery.CreateSqlParameterBriefanrede(languId, gId);
             var bAnredeTable = DatabaseHelper.CheckDatabase(briefAnredeParameter);
