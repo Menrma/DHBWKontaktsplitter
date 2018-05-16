@@ -21,8 +21,6 @@ namespace DHBWKontaktsplitter
 
             if (anredeTable.Rows.Count == 0) return new Tuple<int, string>(0, string.Empty);
 
-            
-
             int anredeId = 0;
             int.TryParse(DatabaseHelper.GetFirstFromDatabaseResult(anredeTable, "ID"), out anredeId);
             var anredeText = DatabaseHelper.GetFirstFromDatabaseResult(anredeTable, "ANREDE");
@@ -41,7 +39,7 @@ namespace DHBWKontaktsplitter
 
         public int GetLanguFromAnredeTable()
         {
-            if (_anredeTable == null) return 1;
+            if (_anredeTable == null || _anredeTable.Rows.Count == 0) return 1;
 
             int languId = 0;
             int.TryParse(DatabaseHelper.GetFirstFromDatabaseResult(_anredeTable, "SPRACHE_ID"), out languId);
@@ -51,7 +49,7 @@ namespace DHBWKontaktsplitter
 
         public int GetGeschlechtFromAnredeTable()
         {
-            if (_anredeTable == null) return 4;
+            if (_anredeTable == null || _anredeTable.Rows.Count == 0) return 4;
 
             int gId = 0;
             int.TryParse(DatabaseHelper.GetFirstFromDatabaseResult(_anredeTable, "GESCHLECHT_ID"), out gId);
@@ -61,6 +59,7 @@ namespace DHBWKontaktsplitter
 
         public Tuple<int, string> GetBriefanrede(int languId, int gId)
         {
+
             var briefAnredeParameter = DBQuery.CreateSqlParameterBriefanrede(languId, gId);
             var bAnredeTable = DatabaseHelper.CheckDatabase(briefAnredeParameter);
 
