@@ -17,10 +17,11 @@ namespace DHBWKontaktsplitter
         {
             var anredeParameter = DBQuery.CreateSqlParameterAnrede(input);
             var anredeTable = DatabaseHelper.CheckDatabase(anredeParameter);
+            _anredeTable = anredeTable;
 
             if (anredeTable.Rows.Count == 0) return new Tuple<int, string>(0, string.Empty);
 
-            _anredeTable = anredeTable;
+            
 
             int anredeId = 0;
             int.TryParse(DatabaseHelper.GetFirstFromDatabaseResult(anredeTable, "ID"), out anredeId);

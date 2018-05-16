@@ -52,7 +52,21 @@ namespace DHBWKontaktsplitter.Framework
         {
             SQLiteCommand cmd = new SQLiteCommand();
 
-            cmd.Parameters.AddWithValue("@title", Formatter.FormatNewTitle(title));
+            var titleSplitted = title.Split('-');
+            if(titleSplitted.Length == 0)
+            {
+                cmd.Parameters.AddWithValue("@title", Formatter.FormatNewTitle(title));
+            }
+            else
+            {
+                var concatTitle = "";
+                foreach(var singleTitle in titleSplitted)
+                {
+                    concatTitle += "%" + singleTitle + "%";
+                }
+                cmd.Parameters.AddWithValue("@title", concatTitle);
+            }
+            
             cmd.CommandText = StaticHelper.GetTitel;
             return cmd;
         }
