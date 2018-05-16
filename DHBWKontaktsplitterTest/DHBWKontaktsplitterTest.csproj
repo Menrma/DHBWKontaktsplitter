@@ -76,6 +76,7 @@
     <Compile Include="UnitTestParserFormatter.cs" />
     <Compile Include="UnitTestParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitTestValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DHBWKontaktsplitter\DHBWKontaktsplitter.csproj">
