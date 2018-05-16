@@ -64,7 +64,7 @@ namespace DHBWKontaktsplitter.ViewModel
                 try
                 {
                     //TODO Erster Parameter weg
-                    var titleInsertCommand = _createSqlParameteTitle(1, entry.EntryText.ToLower().Trim());
+                    var titleInsertCommand = DBQuery.CreateSqlParameterSearchTitle(entry.EntryText.ToLower().Trim());
                     int resCount = DatabaseHelper.InsertDatabase(titleInsertCommand);
                 }
                 catch(Exception ex)
@@ -79,15 +79,7 @@ namespace DHBWKontaktsplitter.ViewModel
         #endregion
 
         #region Methods
-        private SQLiteCommand _createSqlParameteTitle(int languId, string text)
-        {
-            SQLiteCommand cmd = new SQLiteCommand();
-            cmd.CommandText = StaticHelper.InsertTitel;
 
-            cmd.Parameters.AddWithValue("@spracheID", languId);
-            cmd.Parameters.AddWithValue("@title", text);
-            return cmd;
-        }
         #endregion
     }
 }

@@ -88,8 +88,6 @@ namespace DHBWKontaktsplitter.ViewModel
                 }
 
                 var formattedContact = Formatter.DoFormat(execModel.Contact);
-                //execModel.Contact.TitelList.ForEach(x => execModel.Contact.AllTitles += x.Title + " ");
-                //execModel.Contact.AllTitles = execModel.Contact.AllTitles?.Trim();
                 EditButtonIsEnabled = true;
             }
 
@@ -118,7 +116,17 @@ namespace DHBWKontaktsplitter.ViewModel
 
         private void SaveContactCommandExecute(object obj)
         {
-            throw new NotImplementedException();
+            int res = _saveContact();
+
+            var text = DatabaseHelper.GetNotificationText(res);
+            if (res != 11)
+            {
+                MessageBox.Show(text, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                MessageBox.Show(text, "Gespeichert", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         #endregion
@@ -210,6 +218,70 @@ namespace DHBWKontaktsplitter.ViewModel
                 }
 
                 Contact = tmpContact;
+            }
+        }
+
+        private int _saveContact()
+        {
+            int res = Validator.ValidateContact(Contact);
+            if (res != 0)
+            {
+                return res;
+            }
+            else
+            {
+                //Beginn Speicher-Vorgang...
+                try
+                {
+                    var insertContactParameter = DBQuery.CreateSqlParameterSaveContact(Contact);
+                    var cnt = DatabaseHelper.InsertDatabase(insertContactParameter);
+
+                    var getLastContactParamter = DBQuery.CreateSqlParameterLastContact();
+                    var id = DatabaseHelper.CheckDatabase(getLastContactParamter);
+
+                    int contactId = 0;
+                    int.TryParse(id.Rows[0][0].ToString(), out contactId);
+
+                    var toInsert = new List<TitleModel>();
+                    //Alle noch nicht in der Datenbank vorhandene Titel ermitteln
+                    var newTitles = Contact.TitelList.FindAll(x => x.Title_ID == 0);
+                    foreach (var entry in newTitles)
+                    {
+                        //Insert neuen Titel
+                        var insertTitleCommand = DBQuery.CreateSqlParameterTitle(entry.Title, true);
+                        int resCount = DatabaseHelper.InsertDatabase(insertTitleCommand);
+
+                        //Hinzugefügten Titel aus der Datenbank ermitteln
+                        var selectCommand = DBQuery.CreateSqlParameterTitle(entry.Title, false);
+                        var currentTitles = DatabaseHelper.CheckDatabase(selectCommand);
+
+                        //Neu hinzugfügten Titel in Liste schreiben
+                        toInsert.Add(new TitleModel
+                        {
+                            Title_ID = int.Parse(currentTitles.Rows[0][0].ToString()),
+                            Title = currentTitles.Rows[0][1].ToString()
+                        });
+                    }
+
+                    //Alle bereits in der Datenbank vorhandenen Titel ermitteln
+                    var existingTitles = Contact.TitelList.FindAll(x => x.Title_ID != 0);
+                    toInsert.AddRange(existingTitles);
+
+                    //Über alle dem Kontakt zugeordneten Titel loopen und diese in die Datenbank schreiben
+                    foreach (var entry in toInsert)
+                    {
+                        var insertTitleContactParameter = DBQuery.CreateSqlParameterSaveTitle(contactId, entry.Title_ID);
+                        var resTitleContact = DatabaseHelper.InsertDatabase(insertTitleContactParameter);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    //Fehler während der Verarbeitung
+                    return 10;
+                }
+
+                return 11;
             }
         }
 

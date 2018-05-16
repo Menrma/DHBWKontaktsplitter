@@ -16,38 +16,16 @@ namespace DHBWKontaktsplitter.ViewModel
     public class AddNewTitleViewModel : ViewModelBase
     {
         #region Properties
-        private ObservableCollection<SpracheModel> _languList = new ObservableCollection<SpracheModel>();
-        private SpracheModel _selectedLanguItem;
-        private string _eingabeTitle = String.Empty;
+        private string _eingabeTitle = string.Empty;
         #endregion
 
         public AddNewTitleViewModel()
         {
             SaveCommand = new RelayCommand(SaveCommandExecute, SaveCommandCanExecute);
             CancelCommand = new RelayCommand(CancelCommandExecute);
-            _init();
         }
 
         #region Dependency Properties
-        public ObservableCollection<SpracheModel> LanguList
-        {
-            get { return _languList; }
-            set
-            {
-                _languList = value;
-                OnPropertyChanged("LanguList");
-            }
-        }
-
-        public SpracheModel SelectedLanguItem
-        {
-            get { return _selectedLanguItem; }
-            set
-            {
-                _selectedLanguItem = value;
-                OnPropertyChanged("SelectedLanguItem");
-            }
-        }
 
         public string EingabeTitle
         {
@@ -73,7 +51,7 @@ namespace DHBWKontaktsplitter.ViewModel
         private void SaveCommandExecute(object obj)
         {
             EingabeTitle = Formatter.FormatNewTitle(EingabeTitle);
-            var selectCommand = _createSqlParameteTitle(SelectedLanguItem.ID, EingabeTitle, false);
+            var selectCommand = DBQuery.CreateSqlParameterTitle(EingabeTitle, false);
             var currentTitles = DatabaseHelper.CheckDatabase(selectCommand);
             if(currentTitles.Rows.Count > 0)
             {
@@ -82,7 +60,7 @@ namespace DHBWKontaktsplitter.ViewModel
             }
             else
             {
-                var insertCommand = _createSqlParameteTitle(SelectedLanguItem.ID, EingabeTitle, true);
+                var insertCommand = DBQuery.CreateSqlParameterTitle(EingabeTitle, true);
                 int resCount = DatabaseHelper.InsertDatabase(insertCommand);
 
                 if (resCount == 1)
@@ -102,49 +80,17 @@ namespace DHBWKontaktsplitter.ViewModel
 
         private bool SaveCommandCanExecute(object obj)
         {
-            return EingabeTitle.Length > 0 && SelectedLanguItem != null;
+            return EingabeTitle.Length > 0;
         }
         #endregion
 
         #region Methods
-        private void _init()
-        {
-            var langTable = DatabaseHelper.CheckDatabase(new SQLiteCommand(StaticHelper.GetAllLang));
-            LanguList = _convertTableToList(langTable);
-        }
 
         private void _reset()
         {
-            SelectedLanguItem = null;
-            EingabeTitle = String.Empty;
-        }
-        
-        private ObservableCollection<SpracheModel> _convertTableToList(DataTable table)
-        {
-            var liste = new ObservableCollection<SpracheModel>();
-            foreach(DataRow row in table.AsEnumerable())
-            {
-                liste.Add(new SpracheModel()
-                {
-                    ID = int.Parse(row[0].ToString()),
-                    Text = row[1].ToString()
-                });
-            }
-            return liste;
+            EingabeTitle = string.Empty;
         }
 
-        private SQLiteCommand _createSqlParameteTitle(int languId, string text, bool isInsert)
-        {
-            SQLiteCommand cmd = new SQLiteCommand();
-            if (isInsert)
-                cmd.CommandText = StaticHelper.InsertTitel;
-            else
-                cmd.CommandText = StaticHelper.GetTitel;
-
-            cmd.Parameters.AddWithValue("@spracheID", languId);
-            cmd.Parameters.AddWithValue("@title", text);
-            return cmd;
-        }
         #endregion
     }
 }

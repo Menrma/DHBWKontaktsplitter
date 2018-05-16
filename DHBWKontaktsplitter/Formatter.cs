@@ -17,21 +17,7 @@ namespace DHBWKontaktsplitter
             }
             if (!string.IsNullOrEmpty(contact.GeschlechtText))
             {
-                switch (contact.GeschlechtText)
-                {
-                    case "W":
-                        contact.GeschlechtText = "Weiblich";
-                        break;
-                    case "M":
-                        contact.GeschlechtText = "Männlich";
-                        break;
-                    case "X":
-                        //???
-                        break;
-                    case "KA":
-                        contact.GeschlechtText = "Keine Angabe";
-                        break;
-                }
+                contact.GeschlechtText = _convertGeschlechtToText(contact.GeschlechtText);
             }
             if (contact.TitelList.Count > 0)
             {
@@ -86,6 +72,35 @@ namespace DHBWKontaktsplitter
         {
             if (value.Contains(",")) return value.Substring(0, value.IndexOf(","));
             return value;
+        }
+
+        private static string _convertGeschlechtToText(string geschlecht)
+        {
+            switch (geschlecht)
+            {
+                case "W":
+                    return StaticHelper.GeschlechtWeibl;
+                case "M":
+                    return StaticHelper.GeschlechtMannl;
+                case "X":
+                    //???
+                    break;
+            }
+            return StaticHelper.GeschlechtKA;
+        }
+
+        public static string ConvertTextToGeschlecht(string text)
+        {
+            switch (text)
+            {
+                case StaticHelper.GeschlechtWeibl:
+                    return "W";
+                case StaticHelper.GeschlechtMannl:
+                    return "M";
+                case StaticHelper.GeschlechtKA:
+                    return "KA";
+            }
+            return string.Empty;
         }
     }
 }

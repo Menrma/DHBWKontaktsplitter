@@ -13,6 +13,7 @@ namespace DHBWKontaktsplitter
     public class Parser
     {
         private ExecutionModel _execModel;
+        private InformationBase _informationBase = new InformationBase();
 
         public ExecutionModel ExecuteInput(string input)
         {
@@ -26,64 +27,35 @@ namespace DHBWKontaktsplitter
             var inputSplitted = input.Split(' ').ToList<string>().FindAll(x => !string.IsNullOrEmpty(x));
             Console.WriteLine(inputSplitted.Count);
 
-            //Check 'Anrede'
-            //Create SQLiteParameter for 'Anrede'
-            var anredeParameter = _createSqlParameterAnrede(inputSplitted);
-            var anredeTable = DatabaseHelper.CheckDatabase(anredeParameter);
             int languId = 0;
             int gId = 0;
 
-            //if (anredeTable.Rows.Count > 0)
-            //{
-                _execModel.Contact.AnredeText = DatabaseHelper.GetFirstFromDatabaseResult(anredeTable, "ANREDE");
-                _removeMatchedParameterFromList(inputSplitted, _execModel.Contact.AnredeText);
-                int.TryParse(DatabaseHelper.GetFirstFromDatabaseResult(anredeTable, "SPRACHE_ID"), out languId);
-                int.TryParse(DatabaseHelper.GetFirstFromDatabaseResult(anredeTable, "GESCHLECHT_ID"), out gId);
+            //Check 'Anrede'
+            var anredeTuple = _informationBase.GetAnrede(inputSplitted);
+            _execModel.Contact.AnredeId = anredeTuple.Item1;
+            _execModel.Contact.AnredeText = anredeTuple.Item2;
+            _removeMatchedParameterFromList(inputSplitted, _execModel.Contact.AnredeText);
+            languId = _informationBase.GetLanguFromAnredeTable();
+            gId = _informationBase.GetGeschlechtFromAnredeTable();
 
-                if (languId == 0) languId = 1; //DE
-                if (gId == 0) gId = 4; //KA
+            //Get 'Briefanrede'
+            var brAnredeTuple = _informationBase.GetBriefanrede(languId, gId);
+            _execModel.Contact.BriefanredeId = brAnredeTuple.Item1;
+            _execModel.Contact.BriefanredeText = brAnredeTuple.Item2;
 
-                //Get 'Briefanrede'
-                var briefAnredeParameter = _createSqlParameterBriefanrede(languId, gId);
-                var bAnredeTable = DatabaseHelper.CheckDatabase(briefAnredeParameter);
-                _execModel.Contact.BriefanredeText = DatabaseHelper.GetFirstFromDatabaseResult(bAnredeTable, "WERT");
-
-                //Get'Geschlecht'
-                var geschlechtParameter = _createSqlParameteGeschlecht(gId);
-                var geschlechtTable = DatabaseHelper.CheckDatabase(geschlechtParameter);
-                _execModel.Contact.GeschlechtText = DatabaseHelper.GetFirstFromDatabaseResult(geschlechtTable, "WERT");
-
-                //if (!string.IsNullOrEmpty(_execModel.Contact.AnredeText) && languId != 0)
-                //{
-
-                //}
-            //}
-            //else
-            //{
-
-            //}
+            //Get'Geschlecht'
+            var geschlechtTuple = _informationBase.GetGeschlecht(gId);
+            _execModel.Contact.GeschlechtId = geschlechtTuple.Item1;
+            _execModel.Contact.GeschlechtText = geschlechtTuple.Item2;
 
             //Check 'Title'
-            //TODO => Zweiten Paramter ändern
-            if (inputSplitted.Count > 0)
+            var t = _informationBase.GetAllTitles(inputSplitted);
+            _execModel.Contact.TitelList = t.Item1;
+            if(t.Item2.Count > 0)
             {
-                var tmpList = new List<string>(inputSplitted);
-
-                foreach (var inputEntry in tmpList)
+                foreach (var inputEntry in t.Item2)
                 {
-                    var titlesParameter = _createSqlParameterTitle(languId, inputEntry);
-                    var titleTable = DatabaseHelper.CheckDatabase(titlesParameter);
-                    if (titleTable.Rows.Count > 0)
-                    {
-                        var row = titleTable.Rows[0];
-                        _execModel.Contact.TitelList.Add(new TitleModel
-                        {
-                            Title_ID = int.Parse(row[0].ToString()),
-                            Sprache_ID = int.Parse(row[1].ToString()),
-                            Title = row[2].ToString()
-                        });
-                        _removeMatchedParameterFromList(inputSplitted, inputEntry);
-                    }
+                    _removeMatchedParameterFromList(inputSplitted, inputEntry);
                 }
             }
 
@@ -168,55 +140,6 @@ namespace DHBWKontaktsplitter
             } 
 
             return lastName;
-        }
-
-        private SQLiteCommand _createSqlParameterAnrede(List<string> inputList)
-        {
-            string sqlExtension = string.Empty;
-            SQLiteCommand cmd = new SQLiteCommand();
-
-            sqlExtension = "IN ({0})";
-            var paramList = new List<string>();
-            //Check splitted input for 'Anrede'
-            int indexer = 0;
-            foreach(var singleInput in inputList)
-            {
-                var param = "@param" + indexer.ToString();
-                paramList.Add(param);
-                cmd.Parameters.AddWithValue(param, singleInput);
-                indexer++;
-            }
-            sqlExtension = string.Format(sqlExtension, string.Join(",", paramList));
-            cmd.CommandText = string.Format(StaticHelper.CheckAnrede, sqlExtension);
-            return cmd;
-        }
-
-        private SQLiteCommand _createSqlParameterBriefanrede(int spracheId, int geschlechtId)
-        {
-            SQLiteCommand cmd = new SQLiteCommand();
-            cmd.CommandText = StaticHelper.CheckBriefanrede;
-            cmd.Parameters.AddWithValue("@spracheId", spracheId);
-            cmd.Parameters.AddWithValue("@geschlechtID", geschlechtId);
-            return cmd;
-        }
-
-        private SQLiteCommand _createSqlParameteGeschlecht(int geschlechtId)
-        {
-            SQLiteCommand cmd = new SQLiteCommand();
-            cmd.CommandText = StaticHelper.CheckGeschlecht;
-            cmd.Parameters.AddWithValue("@gId", geschlechtId);
-            return cmd;
-        }
-
-        private SQLiteCommand _createSqlParameterTitle(int languId, string title)
-        {
-            SQLiteCommand cmd = new SQLiteCommand();
-            if (languId == 0) languId = 1; // DE is default
-
-            cmd.Parameters.AddWithValue("@spracheId", languId);
-            cmd.Parameters.AddWithValue("@title", "%" + title + "%");
-            cmd.CommandText = StaticHelper.GetTitel;
-            return cmd;
         }
     }
 }

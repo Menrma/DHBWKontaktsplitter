@@ -78,8 +78,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="InformationBase.cs" />
     <Compile Include="Model\TitleModel.cs" />
     <Compile Include="Model\ZuordnungModel.cs" />
+    <Compile Include="Validator.cs" />
     <Compile Include="ViewModel\ManuelleZuordnungViewModel.cs" />
     <Compile Include="View\ManuelleZuordnungView.xaml.cs">
       <DependentUpon>ManuelleZuordnungView.xaml</DependentUpon>
@@ -102,7 +104,6 @@
     <Compile Include="Framework\ViewModelBase.cs" />
     <Compile Include="Model\ContactModel.cs" />
     <Compile Include="Model\ExecutionModel.cs" />
-    <Compile Include="Model\SpracheModel.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="StaticHelper.cs" />
     <Compile Include="ViewModel\AddNewTitleViewModel.cs" />
@@ -140,6 +141,7 @@
     <None Include="Database\Kontaktsplitter.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Compile Include="Framework\DBQuery.cs" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
