@@ -8,12 +8,20 @@ using System.Threading.Tasks;
 
 namespace DHBWKontaktsplitter.Framework
 {
+    /// <summary>
+    /// Klasse für die Kommunikation mit der Datenbank
+    /// </summary>
     public static class DatabaseHelper
     {
+        /// <summary>
+        /// Methode welche SELECT-SQL-Anweisungen an die Datenbank sendet
+        /// </summary>
+        /// <param name="cmd">SELECT-SQLiteCommand</param>
+        /// <returns></returns>
         public static DataTable CheckDatabase(SQLiteCommand cmd)
         {
             var result = new DataTable();
-            //Check database for relevant informations
+            //Verbindung zur Datenbank öffnen
             using (var dbConnection = new SQLiteConnection(StaticHelper.ConnectionString))
             {
                 dbConnection.Open();
@@ -21,6 +29,7 @@ namespace DHBWKontaktsplitter.Framework
 
                 using (var reader = cmd.ExecuteReader())
                 {
+                    //Rückgabe der Anfrage in eine DataTable laden
                     result.Load(reader);
                 }
                 dbConnection.Close();
@@ -28,9 +37,14 @@ namespace DHBWKontaktsplitter.Framework
             }
         }
 
+        /// <summary>
+        /// Methode welche INSERT-SQL-Anweisungen an die Datenbank sendet
+        /// </summary>
+        /// <param name="cmd">INSERT-SQListeCommand</param>
+        /// <returns></returns>
         public static int InsertDatabase(SQLiteCommand cmd)
         {
-            // Insert in Database
+            //Verbindung zur Datenbank öffnen
             using (var dbConnection = new SQLiteConnection(StaticHelper.ConnectionString))
             {
                 dbConnection.Open();
@@ -38,10 +52,17 @@ namespace DHBWKontaktsplitter.Framework
 
                 int resCount = cmd.ExecuteNonQuery();
                 dbConnection.Close();
+                //Anzahl der tatsächlich geschriebenen Datensätze zurückgegeben
                 return resCount;
             }
         }
 
+        /// <summary>
+        /// Methode für die Ermittlung des ersten Resultats aus der Datenbank
+        /// </summary>
+        /// <param name="table">Zu überprüfende DataTable</param>
+        /// <param name="columnName">Name der zu überprüfenden Spalte</param>
+        /// <returns></returns>
         public static string GetFirstFromDatabaseResult(DataTable table, string columnName)
         {
             if (table.Rows.Count > 0)
@@ -54,6 +75,11 @@ namespace DHBWKontaktsplitter.Framework
             }
         }
 
+        /// <summary>
+        /// Methode für das Erstellen eines SQLiteCommands für das Ermitteln eines Fehlertextes
+        /// </summary>
+        /// <param name="errorId">Id des Errors</param>
+        /// <returns></returns>
         private static SQLiteCommand _createSqlParameteError(int errorId)
         {
             SQLiteCommand cmd = new SQLiteCommand();
@@ -62,6 +88,11 @@ namespace DHBWKontaktsplitter.Framework
             return cmd;
         }
 
+        /// <summary>
+        /// Methode für das Erstellen eines SQLiteCommands für das Ermitteln des Textes einer Benachrichtigung
+        /// </summary>
+        /// <param name="notificationId">Id der Benachrichtigung</param>
+        /// <returns></returns>
         public static string GetNotificationText(int notificationId)
         {
             var errorCommand = _createSqlParameteError(notificationId);

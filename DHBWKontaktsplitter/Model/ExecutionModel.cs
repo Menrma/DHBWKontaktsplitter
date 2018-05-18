@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace DHBWKontaktsplitter.Model
 {
+    /// <summary>
+    /// Model, welches während der Verarbeitung der den Parser gefüllt wird
+    /// </summary>
     public class ExecutionModel
     {
         public bool HasError { get; set; } = false;

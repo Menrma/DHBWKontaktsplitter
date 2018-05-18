@@ -7,14 +7,25 @@ using System.Threading.Tasks;
 
 namespace DHBWKontaktsplitter
 {
+    /// <summary>
+    /// Klasse für die Validierung eines Kontakts
+    /// </summary>
     public static class Validator
     {
+        /// <summary>
+        /// Methode für die Validierung eines Kontakts
+        /// </summary>
+        /// <param name="contact">Konakt</param>
+        /// <returns>Id welche anzeigt, ob der Vorgang erfolgreich war oder nicht</returns>
         public static int ValidateContact(ContactModel contact)
         {
             InformationBase informationBase = new InformationBase();
             int languId = 0;
             int gId = 0;
 
+            //Für relevante Attribute vor der Speicherung eines Kontakts überprüfen,
+            //ob diese richtig geschrieben sind. Dies geschieht anhand einer Datenbank-Abfrage auf das
+            //entsprechende Attribut
             if (!string.IsNullOrEmpty(contact.AnredeText))
             {
                 var anredeTupel = informationBase.GetAnrede(new List<string> { contact.AnredeText.ToLower() });
@@ -43,6 +54,7 @@ namespace DHBWKontaktsplitter
 
                 if (geschlContact.ToLower().Trim() != geschl.ToLower().Trim()) return 9;
             }
+            //Kontakt wurde erfolgreich validiert
             return 0;
         }
 

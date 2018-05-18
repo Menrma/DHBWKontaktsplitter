@@ -8,8 +8,16 @@ using System.Threading.Tasks;
 
 namespace DHBWKontaktsplitter.Framework
 {
+    /// <summary>
+    /// Klasse für die Generierung von SQLiteCommand's
+    /// </summary>
     public static class DBQuery
     {
+        /// <summary>
+        /// Methode für die Generierung eines SQLCommand's für die Ermittlung der Anrede
+        /// </summary>
+        /// <param name="inputList">Gesplittete Eingabe als Liste</param>
+        /// <returns>SQLiteCommand</returns>
         public static SQLiteCommand CreateSqlParameterAnrede(List<string> inputList)
         {
             string sqlExtension = string.Empty;
@@ -31,6 +39,12 @@ namespace DHBWKontaktsplitter.Framework
             return cmd;
         }
 
+        /// <summary>
+        /// Methode für die Generierung eines SQLCommand's für die Ermittlung der Briefanrede
+        /// </summary>
+        /// <param name="spracheId">Sprach-Id</param>
+        /// <param name="geschlechtId">Geschlecht-Id</param>
+        /// <returns>SQLiteCommand</returns>
         public static SQLiteCommand CreateSqlParameterBriefanrede(int spracheId, int geschlechtId)
         {
             SQLiteCommand cmd = new SQLiteCommand();
@@ -40,6 +54,11 @@ namespace DHBWKontaktsplitter.Framework
             return cmd;
         }
 
+        /// <summary>
+        /// Methode für die Generierung eines SQLCommand's für die Ermittlung des Geschlechts
+        /// </summary>
+        /// <param name="geschlechtId">Geschlecht-Id</param>
+        /// <returns>SQLiteCommand</returns>
         public static SQLiteCommand CreateSqlParameteGeschlecht(int geschlechtId)
         {
             SQLiteCommand cmd = new SQLiteCommand();
@@ -48,6 +67,11 @@ namespace DHBWKontaktsplitter.Framework
             return cmd;
         }
 
+        /// <summary>
+        /// Methode für die Generierung eines SQLCommand's für die Ermittlung von Titeln
+        /// </summary>
+        /// <param name="title">Titel als String</param>
+        /// <returns>SQLiteCommand</returns>
         public static SQLiteCommand CreateSqlParameterSearchTitle(string title)
         {
             SQLiteCommand cmd = new SQLiteCommand();
@@ -71,6 +95,12 @@ namespace DHBWKontaktsplitter.Framework
             return cmd;
         }
 
+        /// <summary>
+        /// Methode für die Generierung eines SQLCommand's für das Lesen oder Schreiben eines Titels
+        /// </summary>
+        /// <param name="text">Titel</param>
+        /// <param name="isInsert">true wenn insert, false sonst</param>
+        /// <returns>SQLiteCommand</returns>
         public static SQLiteCommand CreateSqlParameterTitle(string text, bool isInsert)
         {
             SQLiteCommand cmd = new SQLiteCommand();
@@ -83,6 +113,11 @@ namespace DHBWKontaktsplitter.Framework
             return cmd;
         }
 
+        /// <summary>
+        /// Methode für die Generierung eines SQLCommand's für die Speicherung des Kontakts
+        /// </summary>
+        /// <param name="contact">Zu speichernder Kontakt</param>
+        /// <returns>SQLiteCommand</returns>
         public static SQLiteCommand CreateSqlParameterSaveContact(ContactModel contact)
         {
             SQLiteCommand cmd = new SQLiteCommand();
@@ -98,6 +133,10 @@ namespace DHBWKontaktsplitter.Framework
             return cmd;
         }
 
+        /// <summary>
+        /// Methode für die Generierung eines SQLCommand's für die Ermittlung des zuletzt gespeicherten Kontakts
+        /// </summary>
+        /// <returns>SQLiteCommand</returns>
         public static SQLiteCommand CreateSqlParameterLastContact()
         {
             SQLiteCommand cmd = new SQLiteCommand();
@@ -105,6 +144,12 @@ namespace DHBWKontaktsplitter.Framework
             return cmd;
         }
 
+        /// <summary>
+        /// Methode für die Generierung eines SQLCommand's für die Speicherung eine Titels zu einem Kontakt
+        /// </summary>
+        /// <param name="contactId">Id des Kontakts</param>
+        /// <param name="titleId">Id des Titels</param>
+        /// <returns>SQLiteCommand</returns>
         public static SQLiteCommand CreateSqlParameterSaveTitle(int contactId, int titleId)
         {
             SQLiteCommand cmd = new SQLiteCommand();

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace DHBWKontaktsplitter.Model
 {
+    /// <summary>
+    /// Model, welches einen Kontakt repräsentiert
+    /// </summary>
     public class ContactModel
     {
         public string Eingabe { get; set; }

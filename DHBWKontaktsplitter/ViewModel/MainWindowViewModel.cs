@@ -12,6 +12,9 @@ using System.Windows.Input;
 
 namespace DHBWKontaktsplitter.ViewModel
 {
+    /// <summary>
+    /// ViewModel der MainWindowView
+    /// </summary>
     public class MainWindowViewModel : ViewModelBase
     {
         #region Properties
@@ -24,6 +27,7 @@ namespace DHBWKontaktsplitter.ViewModel
 
         public MainWindowViewModel()
         {
+            //Commands der Oberfläche registrieren
             EnterCommand = new RelayCommand(EnterCommandExecute);
             AddNewTitleCommand = new RelayCommand(AddNewTitleCommandExecute);
             EditContactCommand = new RelayCommand(EditContactCommandExecute);
@@ -69,62 +73,102 @@ namespace DHBWKontaktsplitter.ViewModel
         public ICommand EditContactCommand { get; set; }
         public ICommand SaveContactCommand { get; set; }
 
+        /// <summary>
+        /// Methode die beim Drücken der Enter-Taste ausgeführt wird
+        /// </summary>
+        /// <param name="obj"></param>
         private void EnterCommandExecute(object obj)
         {
+            //Parser aufrufen
             execModel = _parser.ExecuteInput(Eingabe);
 
+            //Prüfen ob während der Verarbeitung Fehler aufgetreten sind
             if (execModel.HasError)
             {
+                //Ändern-Button nicht auswählbar
                 EditButtonIsEnabled = false;
+                //Text anhand der ErrorId aus der Datenbank lesen
                 var text = DatabaseHelper.GetNotificationText(execModel.ErrorId);
+                //Fehler in einer MessageBox anzeigen
                 MessageBox.Show(text, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             else
             {
-                 if (execModel.NotificationId != 0)
+                //Während der Verabeitung sind keine Fehler aufgetreten
+                //Prüfen ob eine Benachrichtigung angezeigt werden muss
+                if (execModel.NotificationId != 0)
                 {
+                    //Text anhand der NotificationId aus der Datenbank lesen
                     var text = DatabaseHelper.GetNotificationText(execModel.NotificationId);
+                    //Benachrichtigung in einer MessageBox anzeigen
                     MessageBox.Show(text, "Warnung", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
 
+                //Formatierer aufrufen
                 var formattedContact = Formatter.DoFormat(execModel.Contact);
+                //Ändern-Button auswählbar machen
                 EditButtonIsEnabled = true;
             }
 
+            //Prüfen ob die Eingabe nicht zuordenbare Bestandteile enthält
             if(execModel.SplittedInput.Count > 0)
             {
-                // there are not matched items
+                //Nicht zuordenbare Inhalt vorhanden
+                //Weiteres Fenster für die manuelle Zuordnung öffnen
                 var editList = _openManuelleZuordnung(false, Visibility.Hidden);
+                //Manuell zugeordnete Inhalte in das Model mappen
                 _mapZurodnungToModel(editList);
             }
             else
             {
+                //Alle Inhalte konnten zugeordnet werden
+                //Anzeigen des Ergebnisses auf der Benutzeroberfläche
                 Contact = execModel.Contact;
             }
         }
 
+        /// <summary>
+        /// Methode die beim Drücken des 'Neuer-Titel'-Buttons ausgeführt wird
+        /// </summary>
+        /// <param name="obj"></param>
         private void AddNewTitleCommandExecute(object obj)
         {
+            //Fenster zum Anlegen eines neuen Titels öffnen
             new AddNewTitleView().Show();
         }
 
+        /// <summary>
+        /// Methode die beim Drücken des 'Kontakt ändern'-Buttons ausgeführt wird
+        /// </summary>
+        /// <param name="obj"></param>
         private void EditContactCommandExecute(object obj)
         {
+            //Fenster für die manuelle Zuordnung öffnen
             var editList = _openManuelleZuordnung(true, Visibility.Visible);
+            //Manuell zugeordnete Werte in das Model mappen
             _mapZurodnungToModel(editList);
         }
 
+        /// <summary>
+        /// Methode die beim Drücken des 'Speichern'-Buttons ausgeführt wird
+        /// </summary>
+        /// <param name="obj"></param>
         private void SaveContactCommandExecute(object obj)
         {
+            //Methode zum Speichern des Models aufrufen
             int res = _saveContact();
 
+            //Überprüfen ob das Speichern funktioniert hat
+            //Fehler- oder Benachrichtigungs-Text aus der Datenbank lesen
             var text = DatabaseHelper.GetNotificationText(res);
             if (res != 11)
             {
+                //Fehlermeldung in einer MessageBox anzeigen
                 MessageBox.Show(text, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             else
             {
+                //Benachrichtigung in einer MessageBox anzeigen
                 MessageBox.Show(text, "Gespeichert", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
@@ -132,11 +176,19 @@ namespace DHBWKontaktsplitter.ViewModel
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Methode zum Erstellen der Liste für die manuelle Zuordnung
+        /// </summary>
+        /// <param name="execModel">Ergebnis des Parse-Vorgangs</param>
+        /// <param name="changeContact">Wert der angibt, ob der Kontakt geändert wird (true)</param>
+        /// <returns></returns>
         private List<ZuordnungModel> _createZuordnungList(ExecutionModel execModel, bool changeContact = false)
         {
             var list = new List<ZuordnungModel>();
             if (changeContact)
             {
+                //Kontakt wird geändert
+                //Alle Bestandteile der Anrede in Liste speichern, um diese auf der Benutzeroberfläche anzuzeigen
                 list.Add(new ZuordnungModel { EntryText = execModel.Contact.AnredeText, SelectedDropDownEntry = StaticHelper.Anrede });
                 list.Add(new ZuordnungModel { EntryText = execModel.Contact.BriefanredeText, SelectedDropDownEntry = StaticHelper.Briefanrede });
 
@@ -152,6 +204,9 @@ namespace DHBWKontaktsplitter.ViewModel
             }
             else
             {
+                //Kontakt wird nicht bearbeitet
+                //Es liegen nicht zuordenbare Inhalte vor
+                //Lediglich diese in die Liste speichern
                 foreach (var entry in execModel.SplittedInput)
                 {
                     list.Add(new ZuordnungModel { EntryText = entry });
@@ -161,38 +216,57 @@ namespace DHBWKontaktsplitter.ViewModel
             return list;
         }
 
+        /// <summary>
+        /// Methode zum öffnen des Fensters für die manuelle Zuordnung
+        /// </summary>
+        /// <param name="textBoxIsEnabled">Paramter der angibt, ob auf dem zu öffnenden Fenster der die Textboxen bearbeitbar sind</param>
+        /// <param name="newTitleButtonVisibility">Paramter der angibt, ob auf dem zu öffnenden Fenster weitere Einträge hinzugefügt werden können</param>
+        /// <returns></returns>
         private List<ZuordnungModel> _openManuelleZuordnung(bool textBoxIsEnabled, Visibility newTitleButtonVisibility)
         {
             bool changeContact = false;
             if (textBoxIsEnabled) changeContact = true;
+            //Liste mit Einräge erstellen, die auf der Benutzeroberfläche angezeigt werden sollen
             var list = _createZuordnungList(execModel, changeContact);
             var view = new ManuelleZuordnungView();
             var viewModel = new ManuelleZuordnungViewModel();
+            //ViewModel bekommt die Liste mit den darzustellenden Elementen
             viewModel.InputList = list;
+            //Parameter setzen
             viewModel.TextBoxIsEnabled = textBoxIsEnabled;
             viewModel.NewTitleButtonVisibility = newTitleButtonVisibility;
             view.DataContext = viewModel;
+            //Bentzeroberfläche öffnen
             view.ShowDialog();
 
+            //Alle Zuordnungen, welche auf der Benutzeroberfläche vorgenommen wurden, zurückgeben
             return viewModel.InputListObservable.ToList();
         }
 
+        /// <summary>
+        /// Methode zum Synchronisieren der manuellen Zuordnung mit dem Model
+        /// </summary>
+        /// <param name="zuordnungList">Liste mit Zuordnungen</param>
         private void _mapZurodnungToModel(List<ZuordnungModel> zuordnungList)
         {
             if (zuordnungList.Count == 0) return;
 
             var tmpContact = execModel.Contact;
-
+            
+            //Über Liste der Zuordnungen loopen
             foreach(var entry in zuordnungList)
             {
+                //Prüfen ob Anrede
                 if(entry.SelectedDropDownEntry == StaticHelper.Anrede)
                 {
                     tmpContact.AnredeText = entry.EntryText;
                 }
+                //Prüfen ob Briefanrede
                 else if(entry.SelectedDropDownEntry == StaticHelper.Briefanrede)
                 {
                     tmpContact.BriefanredeText = entry.EntryText;
                 }
+                //Prüfen ob Titel
                 else if(entry.SelectedDropDownEntry == StaticHelper.Titel)
                 {
                     var result = execModel.Contact.TitelList.Find(x => x.Title == entry.EntryText);
@@ -204,19 +278,23 @@ namespace DHBWKontaktsplitter.ViewModel
                         Title = entry.EntryText
                     });
                 }
+                //Pürfen ob Geschlecht
                 else if(entry.SelectedDropDownEntry == StaticHelper.Geschlecht)
                 {
                     execModel.Contact.GeschlechtText = entry.EntryText;
                 }
+                //Pürfen ob Vorname
                 else if(entry.SelectedDropDownEntry == StaticHelper.Vorname && execModel.Contact.Vorname != entry.EntryText)
                 {
                     tmpContact.Vorname += entry.EntryText;
                 }
+                //Prüfen ob Nachname
                 else if(entry.SelectedDropDownEntry == StaticHelper.Nachname && execModel.Contact.Nachname != entry.EntryText)
                 {
                     tmpContact.Nachname += " " + entry.EntryText;
                 }
 
+                //Gemapptes Model auf der Benutzeroberfläche anzeigen
                 Contact = tmpContact;
             }
         }

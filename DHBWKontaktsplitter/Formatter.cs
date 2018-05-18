@@ -7,8 +7,16 @@ using System.Threading.Tasks;
 
 namespace DHBWKontaktsplitter
 {
+    /// <summary>
+    /// Klasse für die Formatierung
+    /// </summary>
     public static class Formatter
     {
+        /// <summary>
+        /// Methode für die Formatierung eines Models vom Typ Contact
+        /// </summary>
+        /// <param name="contact">Vom Parser erstelltes Model</param>
+        /// <returns></returns>
         public static ContactModel DoFormat(ContactModel contact)
         {
             if (!string.IsNullOrEmpty(contact.AnredeText))
@@ -44,6 +52,11 @@ namespace DHBWKontaktsplitter
             return contact;
         }
 
+        /// <summary>
+        /// Methode für das Formatieren eines neu eingegebenen Artikels
+        /// </summary>
+        /// <param name="title">Titel</param>
+        /// <returns></returns>
         public static string FormatNewTitle(string title)
         {
             title = title.ToLower();
@@ -51,6 +64,11 @@ namespace DHBWKontaktsplitter
             return title;
         }
 
+        /// <summary>
+        /// Methode, welche das erste Zeichen einer Eingabe Groß schreibt
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>Eingabe mit erstem Zeichen groß</returns>
         private static string _uppercaseFirstChar(string value)
         {
             var valueArray = value.Trim().Split(' ');
@@ -68,12 +86,22 @@ namespace DHBWKontaktsplitter
             }
         }
 
+        /// <summary>
+        /// Methode welche ein Komma aus einer Eingabe entfernt
+        /// </summary>
+        /// <param name="value">Eingabe ohne Komma</param>
+        /// <returns></returns>
         private static string _removeSpecialCharacters(string value)
         {
             if (value.Contains(",")) return value.Substring(0, value.IndexOf(","));
             return value;
         }
 
+        /// <summary>
+        /// Methode für die Umwandlung eines Geschlechts-Kürzels in einen definierten Text
+        /// </summary>
+        /// <param name="geschlecht">Geschlecht-Kürzel (W,M,KA)</param>
+        /// <returns></returns>
         private static string _convertGeschlechtToText(string geschlecht)
         {
             switch (geschlecht)
@@ -89,6 +117,11 @@ namespace DHBWKontaktsplitter
             return StaticHelper.GeschlechtKA;
         }
 
+        /// <summary>
+        /// Methode für die Umwandlung eines Geschlecht-Texts in das entsprechende Kürzel
+        /// </summary>
+        /// <param name="text">Geschlecht als Text</param>
+        /// <returns></returns>
         public static string ConvertTextToGeschlecht(string text)
         {
             switch (text)

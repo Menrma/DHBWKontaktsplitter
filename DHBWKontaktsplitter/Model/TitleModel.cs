@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace DHBWKontaktsplitter.Model
 {
+    /// <summary>
+    /// Model, welches einen Titel repräsentiert
+    /// </summary>
     public class TitleModel
     {
         public int Title_ID { get; set; }

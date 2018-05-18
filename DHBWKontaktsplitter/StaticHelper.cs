@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace DHBWKontaktsplitter
 {
+    /// <summary>
+    /// Klassse für das Auslagern von Magic-Strings
+    /// </summary>
     public static class StaticHelper
     {
         public static readonly string ConnectionString = "Data Source = Database/Kontaktsplitter.db; Version = 3;";

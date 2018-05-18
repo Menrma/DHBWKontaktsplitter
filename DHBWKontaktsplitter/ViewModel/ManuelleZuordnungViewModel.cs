@@ -12,6 +12,9 @@ using System.Windows.Input;
 
 namespace DHBWKontaktsplitter.ViewModel
 {
+    /// <summary>
+    /// ViewModel der ManuelleZuordnungView
+    /// </summary>
     public class ManuelleZuordnungViewModel : ViewModelBase
     {
         #region Properties
@@ -20,6 +23,7 @@ namespace DHBWKontaktsplitter.ViewModel
 
         public ManuelleZuordnungViewModel()
         {
+            //Commands der Oberfläche registrieren
             AddNewTitleCommand = new RelayCommand(AddNewTitleCommandExecute);
             SaveZuordnungCommand = new RelayCommand(SaveZuordnungCommandExecute);
         }
@@ -49,22 +53,33 @@ namespace DHBWKontaktsplitter.ViewModel
         public ICommand AddNewTitleCommand { get; set; }
         public ICommand SaveZuordnungCommand { get; set; }
 
+        /// <summary>
+        /// Methode die beim Drücken des 'Weiterer Eintrag'-Buttons aufgerufen wird
+        /// </summary>
+        /// <param name="obj"></param>
         private void AddNewTitleCommandExecute(object obj)
         {
+            //Initialen Eintrag auf der Benutzeroberfläche anzeigen
             InputListObservable.Add(new ZuordnungModel());
         }
 
+        /// <summary>
+        /// Methode die beim Drücken des 'Zurodnen'-Buttons ausgeführt wird
+        /// </summary>
+        /// <param name="obj"></param>
         private void SaveZuordnungCommandExecute(object obj)
         {
             //Lernfunktion für Titel
-            //Alle Titel von der Oberfläche ermitteln und versuchen in die Datenbank zu speichern
+            //Alle Elemente vom Typ Titel von der Oberfläche ermitteln und versuchen in die Datenbank zu speichern
             var titles = InputListObservable.ToList().FindAll(x => x.SelectedDropDownEntry == StaticHelper.Titel);
-            foreach(var entry in titles)
+            //Loop über jeden Titel..
+            foreach (var entry in titles)
             {
                 try
                 {
-                    //TODO Erster Parameter weg
+                    //SQL-Command für das Einfügen vrobereiten
                     var titleInsertCommand = DBQuery.CreateSqlParameterSearchTitle(entry.EntryText.ToLower().Trim());
+                    //SQL-Command ausführen und Titel in die Datenbank schreiben
                     int resCount = DatabaseHelper.InsertDatabase(titleInsertCommand);
                 }
                 catch(Exception ex)
@@ -74,12 +89,9 @@ namespace DHBWKontaktsplitter.ViewModel
                 }
             }
 
+            //Nach erfolgreicher Verarbeitung ==> Fenster schließen
             ((Window)obj).Close();
         }
-        #endregion
-
-        #region Methods
-
         #endregion
     }
 }
